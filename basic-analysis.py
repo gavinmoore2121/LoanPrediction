@@ -162,8 +162,8 @@ def perform_bivariate_analysis(data, data_name):
     plt.subplot(222)
     bins = [0, 2500, 4000, 6000, 81000]
     group = ['Low', 'Average', 'High', 'Very High']
-    data['Income_bin'] = pd.cut(data['ApplicantIncome'], bins, labels=group)
-    income_bin = pd.crosstab(data['Income_bin'], data['Loan_Status'])
+    data['Income_Bin'] = pd.cut(data['ApplicantIncome'], bins, labels=group)
+    income_bin = pd.crosstab(data['Income_Bin'], data['Loan_Status'])
     # Notice: Income still appears independent of loan status when grouped.
     income_bin.div(income_bin.sum(1).astype(float), axis=0).plot(kind="bar", stacked=True, xlabel='Applicant Income',
                                                                  ylabel='Proportion', ax=axes[0, 1])
