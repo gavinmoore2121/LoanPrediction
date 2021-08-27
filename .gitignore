@@ -114,5 +114,4 @@ dmypy.json
 .pyre/
 /TrainDataUnivariateAnalysis/
 /TrainDataBivariateAnalysis/
-PredictedApproval
-TrainDataHeatmap.png
+
