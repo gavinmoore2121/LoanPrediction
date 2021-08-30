@@ -40,6 +40,8 @@ def main():
     # Create a heatmap of correlations
     create_heatmap(train_data, 'TrainData')
 
+    train_data = create_additional_features(train_data, 'TrainData')
+
 
 def print_data_overview(data):
     """
@@ -212,6 +214,63 @@ def create_heatmap(data, data_name):
     f, axes = plt.subplots(figsize=(9, 6))
     sns.heatmap(matrix, vmax=0.8, square=True, cmap="BuPu")
     plt.savefig(data_name + 'Heatmap')
+
+
+def create_additional_features(data, data_name):
+    """
+    Add the log total income, EMI, and balance income fields to the data. These fields are likely to affect the
+    target variable.
+
+    The total income column represents the combined Applicant Income and Coapplicant Income, and will likely correlate
+    with higher approval rates. Because this data is skewed right, the log total income is used instead. The EMI
+    (Equated Monthly Installment) is the monthly amount to be paid by the applicant, and will likely correlate with
+    higher difficult paying the loan and therefore lower approval rates. The Balance Income is the income left after
+    the EMI has been paid, and will likely correlate with higher approval rates.
+
+    Several graphs visualizing the new fields will also be created and added to the project files.
+    :param data: The data to add the columns to.
+    :param data_name: The distinguishing prefix to be added to the saved graphs.
+    :return: The data with the columns added.
+    """
+    # Create folder for new visualizations
+    try:
+        os.mkdir(data_name + 'AdditionalFeatures')
+    except FileExistsError:
+        pass
+    data_name = data_name + 'AdditionalFeatures/' + data_name
+
+    # Create field for total income.
+    fig = plt.figure(figsize=(9, 6))
+    fig.add_subplot(121)
+    plt.subplot(121)
+    # Notice: Graph ays a right-skew.
+    data['Total_Income'] = data['ApplicantIncome'] + data['CoapplicantIncome']
+    sns.histplot(data['Total_Income'], stat='density', kde=True)
+
+    # Create field for log total income to correct right skew
+    plt.subplot(122)
+    data['Total_Income_Log'] = np.log(data['Total_Income'])
+    sns.histplot(data['Total_Income_Log'], stat='density', kde=True)
+    plt.savefig(data_name + 'TotalIncome')
+
+    # Create field for EMI
+    data['EMI'] = data['LoanAmount'] / data['Loan_Amount_Term']
+    plt.figure()
+    sns.histplot(data['EMI'], stat='density', kde=True)
+    plt.savefig(data_name + 'EMI')
+
+    # Create field for Balance Income
+    plt.figure()
+    # Multiply by 1000 to correct units
+    data['Balance_Income'] = data['Total_Income'] - data['EMI'] * 1000
+    sns.histplot(data['Balance_Income'], stat='density', kde=True)
+    plt.savefig(data_name + 'BalanceIncome')
+
+    # Drop variables used to create features to reduce noise
+    data = data.drop(['ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', 'Loan_Amount_Term'], axis=1)
+
+    # Return altered data
+    return data
 
 
 if __name__ == '__main__':

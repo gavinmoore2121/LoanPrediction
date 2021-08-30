@@ -116,3 +116,5 @@ dmypy.json
 /TrainDataBivariateAnalysis/
 
 TrainDataHeatmap.png
+/train_dataAdditionalFeatures/
+/TrainDataAdditionalFeatures/
